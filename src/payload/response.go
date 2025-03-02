@@ -20,3 +20,7 @@ type BybitResponse struct {
 	RetMsg  string `json:"retMsg"`
 	Time    int64  `json:"time"`
 }
+
+type ErrorResponse struct {
+	Message string `json:"message"`
+}

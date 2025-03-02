@@ -13,6 +13,7 @@ func main() {
 
 	http.HandleFunc("/klines", klinesHandler.GetKlines)
 	http.HandleFunc("/klines/csv", klinesHandler.GetKlinesCSV)
+	http.HandleFunc("/symbols", klinesHandler.GetAvailableSymbols)
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("../static"))))
 

@@ -46,7 +46,6 @@ func (s *KlinesService) GetKlines(symbol, interval string, days int) ([]payload.
 
 	var formattedCandles []payload.FormattedCandle
 	for _, candle := range result.Result.List {
-		// Преобразуем open_time (может быть строкой или числом)
 		var openTime int64
 		switch v := candle[0].(type) {
 		case float64:
@@ -110,6 +109,10 @@ func (s *KlinesService) CreateCSVFile(symbol, interval string, days int) (string
 	candles, err := s.GetKlines(symbol, interval, days)
 	if err != nil {
 		return "", err
+	}
+
+	if candles == nil {
+		return "", fmt.Errorf("нет данных для данной валюты")
 	}
 
 	fileName := fmt.Sprintf("%s_%s_%dd.csv", symbol, interval, days)
