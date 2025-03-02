@@ -1,5 +1,7 @@
 package payload
 
+import "fmt"
+
 type FormattedCandle struct {
 	OpenTime    string `json:"open_time"`    // Время открытия в читаемом формате
 	OpenPrice   string `json:"open_price"`   // Цена открытия
@@ -23,4 +25,12 @@ type BybitResponse struct {
 
 type ErrorResponse struct {
 	Message string `json:"message"`
+}
+
+type NoDataError struct {
+	Symbol string
+}
+
+func (e *NoDataError) Error() string {
+	return fmt.Sprintf("нет данных для валюты: %s", e.Symbol)
 }

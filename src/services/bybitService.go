@@ -112,7 +112,7 @@ func (s *KlinesService) CreateCSVFile(symbol, interval string, days int) (string
 	}
 
 	if candles == nil {
-		return "", fmt.Errorf("нет данных для данной валюты")
+		return "", &payload.NoDataError{Symbol: symbol}
 	}
 
 	fileName := fmt.Sprintf("%s_%s_%dd.csv", symbol, interval, days)

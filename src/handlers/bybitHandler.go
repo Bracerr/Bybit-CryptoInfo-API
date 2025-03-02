@@ -4,6 +4,7 @@ import (
 	"API-CRYPT/src/payload"
 	"API-CRYPT/src/services"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -40,7 +41,7 @@ func (h *KlinesHandler) GetKlines(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if candles == nil {
-		h.respondWithError(w, http.StatusBadRequest, "Нет данных для данной валюты")
+		h.respondWithError(w, http.StatusBadRequest, "Нет данных для данной валюты: "+symbol)
 		return
 	}
 
@@ -89,6 +90,11 @@ func (h *KlinesHandler) GetKlinesCSV(w http.ResponseWriter, r *http.Request) {
 
 	fileName, err := h.service.CreateCSVFile(symbol, interval, days)
 	if err != nil {
+		var noDataError *payload.NoDataError
+		if errors.As(err, &noDataError) {
+			h.respondWithError(w, http.StatusBadRequest, err.Error())
+			return
+		}
 		h.respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
