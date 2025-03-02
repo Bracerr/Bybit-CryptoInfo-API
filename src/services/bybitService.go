@@ -2,10 +2,12 @@ package services
 
 import (
 	"API-CRYPT/src/payload"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 )
@@ -102,4 +104,51 @@ func (s *KlinesService) GetAvailableSymbols() ([]string, error) {
 	}
 
 	return symbols, nil
+}
+
+func (s *KlinesService) CreateCSVFile(symbol, interval string, days int) (string, error) {
+	candles, err := s.GetKlines(symbol, interval, days)
+	if err != nil {
+		return "", err
+	}
+
+	fileName := fmt.Sprintf("%s_%s_%dd.csv", symbol, interval, days)
+	filePath := "../static/" + fileName
+
+	if _, err := os.Stat("../static"); os.IsNotExist(err) {
+		if err := os.Mkdir("../static", 0755); err != nil {
+			return "", fmt.Errorf("ошибка при создании папки static: %v", err)
+		}
+	}
+
+	file, err := os.Create(filePath)
+	if err != nil {
+		return "", fmt.Errorf("ошибка при создании файла: %v", err)
+	}
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	headers := []string{"Open Time", "Open Price", "High Price", "Low Price", "Close Price", "Volume Base", "Volume Quote"}
+	if err := writer.Write(headers); err != nil {
+		return "", fmt.Errorf("ошибка при записи заголовков CSV: %v", err)
+	}
+
+	for _, candle := range candles {
+		record := []string{
+			candle.OpenTime,
+			candle.OpenPrice,
+			candle.HighPrice,
+			candle.LowPrice,
+			candle.ClosePrice,
+			candle.VolumeBase,
+			candle.VolumeQuote,
+		}
+		if err := writer.Write(record); err != nil {
+			return "", fmt.Errorf("ошибка при записи данных в CSV: %v", err)
+		}
+	}
+
+	return fileName, nil
 }

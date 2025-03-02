@@ -12,7 +12,9 @@ func main() {
 	klinesHandler := handler.NewKlinesHandler(klinesService)
 
 	http.HandleFunc("/klines", klinesHandler.GetKlines)
-	http.HandleFunc("/symbols", klinesHandler.GetAvailableSymbols)
+	http.HandleFunc("/klines/csv", klinesHandler.GetKlinesCSV)
+
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("../static"))))
 
 	fmt.Println("Сервер запущен на http://localhost:8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
