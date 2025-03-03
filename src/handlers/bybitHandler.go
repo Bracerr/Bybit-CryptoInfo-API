@@ -40,11 +40,6 @@ func (h *KlinesHandler) GetKlines(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if candles == nil {
-		h.respondWithError(w, http.StatusBadRequest, "Нет данных для данной валюты: "+symbol)
-		return
-	}
-
 	formattedJSON, err := json.MarshalIndent(candles, "", "  ")
 	if err != nil {
 		h.respondWithError(w, http.StatusInternalServerError, "Ошибка при преобразовании в JSON")

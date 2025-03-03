@@ -36,7 +36,8 @@ func (s *KlinesService) GetKlinesWithIntervals(symbol, interval string, days int
 			currentStartTime = startTime
 		}
 
-		url := fmt.Sprintf("%s?category=spot&symbol=%s&interval=%s&start=%d&end=%d", bybitAPIURL, symbol, interval, currentStartTime, currentEndTime)
+		url := fmt.Sprintf("%s?category=spot&symbol=%s&interval=%s&start=%d&end=%d", bybitAPIURL, symbol,
+			interval, currentStartTime, currentEndTime)
 
 		resp, err := http.Get(url)
 		if err != nil {
@@ -52,6 +53,14 @@ func (s *KlinesService) GetKlinesWithIntervals(symbol, interval string, days int
 		var result payload.BybitResponse
 		if err := json.Unmarshal(body, &result); err != nil {
 			return nil, fmt.Errorf("ошибка при парсинге JSON: %v", err)
+		}
+
+		if result.RetCode != 0 {
+			return nil, fmt.Errorf("ошибка API: %s (код: %d)", result.RetMsg, result.RetCode)
+		}
+
+		if len(result.Result.List) == 0 {
+			return nil, fmt.Errorf("пустой ответ от API для интервала %s", interval)
 		}
 
 		for _, candle := range result.Result.List {
@@ -83,7 +92,6 @@ func (s *KlinesService) GetKlinesWithIntervals(symbol, interval string, days int
 
 	return allCandles, nil
 }
-
 func (s *KlinesService) GetAvailableSymbols() ([]string, error) {
 	url := "https://api.bybit.com/v5/market/instruments-info?category=spot"
 
@@ -121,10 +129,6 @@ func (s *KlinesService) CreateCSVFile(symbol, interval string, days int) (string
 	candles, err := s.GetKlinesWithIntervals(symbol, interval, days)
 	if err != nil {
 		return "", err
-	}
-
-	if len(candles) == 0 {
-		return "", &payload.NoDataError{Symbol: symbol}
 	}
 
 	fileName := fmt.Sprintf("%s_%s_%dd.csv", symbol, interval, days)
