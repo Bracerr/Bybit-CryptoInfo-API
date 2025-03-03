@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"API-CRYPT/src/constanst"
 	"API-CRYPT/src/payload"
 	"API-CRYPT/src/services"
 	"encoding/json"
@@ -31,6 +32,25 @@ func (h *KlinesHandler) GetKlines(w http.ResponseWriter, r *http.Request) {
 	days, err := strconv.Atoi(daysStr)
 	if err != nil {
 		h.respondWithError(w, http.StatusBadRequest, "days должен быть числом")
+		return
+	}
+
+	if days <= 0 {
+		h.respondWithError(w, http.StatusBadRequest, "days должно быть положительным числом")
+		return
+	}
+
+	isValidInterval := false
+
+	for _, v := range constanst.GetValidateIntervals() {
+		if interval == v {
+			isValidInterval = true
+			break
+		}
+	}
+
+	if !isValidInterval {
+		h.respondWithError(w, http.StatusBadRequest, "interval должен быть одним из следующих значений: 1, 3, 5, 15, 30, 60, 120, 240, 720")
 		return
 	}
 
