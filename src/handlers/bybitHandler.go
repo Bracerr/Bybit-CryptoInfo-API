@@ -34,7 +34,7 @@ func (h *KlinesHandler) GetKlines(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	candles, err := h.service.GetKlines(symbol, interval, days)
+	candles, err := h.service.GetKlinesWithIntervals(symbol, interval, days)
 	if err != nil {
 		h.respondWithError(w, http.StatusInternalServerError, err.Error())
 		return

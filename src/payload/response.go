@@ -14,9 +14,10 @@ type FormattedCandle struct {
 
 type BybitResponse struct {
 	Result struct {
-		Category string          `json:"category"`
-		List     [][]interface{} `json:"list"` // Список свечей
-		Symbol   string          `json:"symbol"`
+		Category       string          `json:"category"`
+		List           [][]interface{} `json:"list"`
+		Symbol         string          `json:"symbol"`
+		NextPageCursor string          `json:"nextPageCursor"`
 	} `json:"result"`
 	RetCode int    `json:"retCode"`
 	RetMsg  string `json:"retMsg"`
